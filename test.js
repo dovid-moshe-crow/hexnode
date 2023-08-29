@@ -5,17 +5,16 @@ const app = express();
 config();
 import fetch from "node-fetch";
 
-async function getReport() {
-  const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
-    headers: { Authorization: process.env.API_KEY },
-  });
-  return (await res.json()).results
-    .filter((x) => dayjs().subtract(1, "day").isAfter(dayjs(x.last_reported)))
-    .map((x) => x.device_name);
+async function addAppToCatalog(id) {
+  const res = await fetch(
+    `https://or-efraim1.hexnodemdm.com/api/v1/applications/`,
+    { headers: { Authorization: process.env.API_KEY }, method: "GET" }
+  );
+
+  return await res.json();
 }
 
-
-async function getUnmanaged() {
+async function getReport() {
   const devices = (
     await (
       await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
@@ -60,13 +59,12 @@ async function getUnmanaged() {
   }))).filter(x => x);
 }
 
-app.get("/last_reported", async (req, res) => {
+app.get("/", async (req, res) => {
   return res.json(await getReport());
 });
 
-app.get("/unmanaged", async (req, res) => {
-  return res.json(await getUnmanaged());
-});
+app.listen(5555);
 
-const port = process.env.PORT;
-app.listen(port, () => console.log(`listening on port ${port}...`));
+// (async () => {
+//   console.log(await getReport());
+// })();
