@@ -14,6 +14,9 @@ async function getReport() {
     .map((x) => x.device_name);
 }
 
+async function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function getUnmanaged() {
   const devices = (
@@ -24,40 +27,34 @@ async function getUnmanaged() {
     ).json()
   ).results;
 
-  return (await Promise.all(devices.map(async (x) => {
-    if (x.os_name != "iOS") {
-      return false;
+  const unmanagedDevices = [];
+
+  for (const device of devices) {
+    if (device.os_name === "iOS") {
+      const deviceApps = await (
+        await fetch(
+          `https://or-efraim1.hexnodemdm.com/api/v1/devices/${device.id}/applications/`,
+          {
+            headers: { Authorization: process.env.API_KEY },
+          }
+        )
+      ).json();
+
+      const unmanagedApps = deviceApps.results
+        .filter((app) => app.managed === false)
+        .map((app) => app.name);
+
+      if (unmanagedApps.length > 0) {
+        unmanagedDevices.push({
+          name: device.device_name,
+          apps: unmanagedApps,
+        });
+      }
     }
+    await delay(1000);
+  }
 
-    const device = await (
-      await fetch(
-        `https://or-efraim1.hexnodemdm.com/api/v1/devices/${x.id}/applications/`,
-        {
-          headers: { Authorization: process.env.API_KEY },
-        }
-      )
-    ).json();
-
-   // console.log(device);
-
-    const apps = device.results
-      .filter((x) => x.managed === false)
-      .map((x) => x.name);
-
-    //console.log(apps)
-
-    console.log({
-      name: x.device_name,
-      apps,
-    })
-
-    if(!apps.length) return false
-
-    return {
-      name: x.device_name,
-      apps,
-    };
-  }))).filter(x => x);
+  return unmanagedDevices;
 }
 
 app.get("/last_reported", async (req, res) => {
@@ -70,3 +67,8 @@ app.get("/unmanaged", async (req, res) => {
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
+
+
+
+
+
