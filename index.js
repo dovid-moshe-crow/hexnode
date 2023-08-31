@@ -5,6 +5,27 @@ const app = express();
 config();
 import fetch from "node-fetch";
 
+let appList = [];
+
+async function updateApplist() {
+  let page = 1;
+  appList = [];
+
+  while (true) {
+    const res = await (
+      await fetch(
+        `https://or-efraim1.hexnodemdm.com/api/v1/applications/?page=${page}`,
+        {
+          headers: { Authorization: process.env.API_KEY },
+        }
+      )
+    ).json();
+    appList = appList.concat(res.results);
+    if (!res.next) break;
+    page++;
+  }
+}
+
 async function getReport() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
     headers: { Authorization: process.env.API_KEY },
@@ -15,7 +36,7 @@ async function getReport() {
 }
 
 async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getUnmanaged() {
@@ -65,10 +86,14 @@ app.get("/unmanaged", async (req, res) => {
   return res.json(await getUnmanaged());
 });
 
+app.get("/app_list", async (req, res) => {
+  return res.json(appList);
+});
+
+app.post("update_app_list", async (req, res) => {
+  await updateApplist();
+  return res.json("ok");
+});
+
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
-
-
-
-
-
