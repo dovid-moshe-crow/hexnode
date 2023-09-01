@@ -90,7 +90,7 @@ app.get("/app_list", async (req, res) => {
   return res.json(appList);
 });
 
-app.post("update_app_list", async (req, res) => {
+app.post("/update_app_list", async (req, res) => {
   await updateApplist();
   return res.json("ok");
 });
