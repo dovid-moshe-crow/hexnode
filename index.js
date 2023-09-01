@@ -11,7 +11,13 @@ async function updateApplist() {
   let page = 1;
   appList = [];
 
-  const catalog = (await(await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/")).json()).apps;
+  const catalog = (
+    await (
+      await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/", {
+        headers: { Authorization: process.env.API_KEY },
+      })
+    ).json()
+  ).apps;
 
   while (true) {
     const res = await (
@@ -22,7 +28,12 @@ async function updateApplist() {
         }
       )
     ).json();
-    appList = appList.concat(res.results.map(x => ({...x,installed: catalog.filter(e => e.id === x.id).length > 0})));
+    appList = appList.concat(
+      res.results.map((x) => ({
+        ...x,
+        installed: catalog.filter((e) => e.id === x.id).length > 0,
+      }))
+    );
     if (!res.next) break;
     page++;
   }
@@ -90,7 +101,6 @@ app.get("/unmanaged", async (req, res) => {
 
 app.get("/app_list", async (req, res) => {
   return res.json(appList);
-
 });
 
 app.post("/update_app_list", async (req, res) => {
@@ -100,4 +110,3 @@ app.post("/update_app_list", async (req, res) => {
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
-
