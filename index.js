@@ -39,6 +39,19 @@ async function updateApplist() {
   }
 }
 
+async function addApp(id) {
+  const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
+    headers: { Authorization: process.env.API_KEY },
+    method: "POST",
+    body: {
+      add_apps: [id],
+      remove_apps: [],
+      add_groups: [],
+      remove_groups: [],
+    },
+  });
+}
+
 async function getReport() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
     headers: { Authorization: process.env.API_KEY },
@@ -104,6 +117,12 @@ app.get("/app_list", async (req, res) => {
 });
 
 app.post("/update_app_list", async (req, res) => {
+  await updateApplist();
+  return res.json("ok");
+});
+
+app.post("/add_app/:id", async (req, res) => {
+  await addApp(req.params.id);
   await updateApplist();
   return res.json("ok");
 });
