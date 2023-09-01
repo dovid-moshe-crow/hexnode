@@ -11,6 +11,8 @@ async function updateApplist() {
   let page = 1;
   appList = [];
 
+  const catalog = (await(await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/")).json()).apps;
+
   while (true) {
     const res = await (
       await fetch(
@@ -20,7 +22,7 @@ async function updateApplist() {
         }
       )
     ).json();
-    appList = appList.concat(res.results);
+    appList = appList.concat(res.results.map(x => ({...x,installed: catalog.filter(e => e.id === x.id).length > 0})));
     if (!res.next) break;
     page++;
   }
@@ -88,6 +90,7 @@ app.get("/unmanaged", async (req, res) => {
 
 app.get("/app_list", async (req, res) => {
   return res.json(appList);
+
 });
 
 app.post("/update_app_list", async (req, res) => {
