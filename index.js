@@ -50,6 +50,8 @@ async function addApp(id) {
       remove_groups: [],
     },
   });
+
+  console.log(res)
 }
 
 async function getReport() {
