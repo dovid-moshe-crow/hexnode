@@ -44,12 +44,12 @@ async function addApp(id) {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/", {
     headers: { Authorization: process.env.API_KEY, "Content-Type": "application/json" },
     method: "POST",
-    body: {
+    body: JSON.stringify({
       add_apps: [id],
       remove_apps: [],
       add_groups: [],
       remove_groups: [],
-    },
+    }),
   });
 
   console.log(res)
