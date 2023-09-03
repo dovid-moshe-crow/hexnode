@@ -41,7 +41,7 @@ async function updateApplist() {
 
 async function addApp(id) {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/", {
-    headers: { Authorization: process.env.API_KEY },
+    headers: { Authorization: process.env.API_KEY, "Content-Type": "application/json" },
     method: "POST",
     body: {
       add_apps: [id],
