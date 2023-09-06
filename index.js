@@ -40,19 +40,25 @@ async function updateApplist() {
 }
 
 async function addApp(id) {
-  console.log(id)
-  const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/", {
-    headers: { Authorization: process.env.API_KEY, "Content-Type": "application/json" },
-    method: "POST",
-    body: JSON.stringify({
-      add_apps: [id],
-      remove_apps: [],
-      add_groups: [],
-      remove_groups: [],
-    }),
-  });
+  console.log(id);
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        add_apps: [id],
+        remove_apps: [],
+        add_groups: [],
+        remove_groups: [],
+      }),
+    }
+  );
 
-  console.log(res)
+  console.log(res);
 }
 
 async function getReport() {
@@ -126,7 +132,7 @@ app.post("/update_app_list", async (req, res) => {
 
 app.post("/add_app/:id", async (req, res) => {
   await addApp(req.params.id);
-  await updateApplist();
+  updateApplist();
   return res.json("ok");
 });
 
