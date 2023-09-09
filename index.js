@@ -13,7 +13,7 @@ async function updateApplist() {
 
   const catalog = (
     await (
-      await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/", {
+      await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/", {
         headers: { Authorization: process.env.API_KEY },
       })
     ).json()
@@ -42,7 +42,7 @@ async function updateApplist() {
 async function addApp(id) {
   console.log(id);
   const res = await fetch(
-    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/9/",
+    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/",
     {
       headers: {
         Authorization: process.env.API_KEY,
