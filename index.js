@@ -61,6 +61,28 @@ async function addApp(id) {
   console.log(res);
 }
 
+async function removeApp(id) {
+  console.log(id);
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        add_apps: [],
+        remove_apps: [id],
+        add_groups: [],
+        remove_groups: [],
+      }),
+    }
+  );
+
+  console.log(res);
+}
+
 async function getReport() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
     headers: { Authorization: process.env.API_KEY },
@@ -135,6 +157,13 @@ app.post("/add_app/:id", async (req, res) => {
   updateApplist();
   return res.json("ok");
 });
+
+app.post("/remove_app/:id", async (req, res) => {
+  await removeApp(req.params.id);
+  updateApplist();
+  return res.json("ok");
+});
+
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
