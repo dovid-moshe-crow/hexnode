@@ -272,5 +272,45 @@ app.post("/add_app/:id", async (req, res) => {
   return res.json("ok");
 });
 
+app.get("/devices", async (req, res) => {
+  return res.json(await getDevices());
+});
+
+app.get("/device-details/:id", async (req, res) => {
+  return res.json(await getDeviceDetails(req.params.id));
+});
+
+app.post("/send-message", async (req, res) => {
+  await sendMessage(req.body.ids, req.body.message);
+  return res.json("ok");
+});
+
+app.post("/change-owner", async (req, res) => {
+  await changeOwner(req.body.user, req.body.ids);
+  return res.json("ok");
+});
+
+app.post("/change-name", async (req, res) => {
+  await changeName(req.body.id, req.body.name);
+  return res.json("ok");
+});
+
+app.post("/remove-devices", async (req, res) => {
+  await removeDevices(req.body.ids);
+  return res.json("ok");
+});
+
+app.post("/install-apps", async (req, res) => {
+  await installApps(req.body.ids, req.body.apps);
+  return res.json("ok");
+});
+
+
+app.post("/remove_app/:id", async (req, res) => {
+  await removeApp(req.params.id);
+  updateApplist();
+  return res.json("ok");
+});
+
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
