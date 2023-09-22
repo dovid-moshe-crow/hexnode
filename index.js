@@ -1,11 +1,125 @@
 import dayjs from "dayjs";
 import { config } from "dotenv";
+config();
 import express from "express";
 const app = express();
-config();
+app.use(express.json());
+
 import fetch from "node-fetch";
 
 let appList = [];
+
+async function getDevices() {
+  const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
+    headers: { Authorization: process.env.API_KEY },
+  });
+  return (await res.json()).results;
+}
+
+async function getDeviceDetails(id) {
+  const res = await fetch(
+    `https://or-efraim1.hexnodemdm.com/api/v1/devices/${id}/`,
+    {
+      headers: { Authorization: process.env.API_KEY },
+    }
+  );
+  return await res.json();
+}
+
+/**
+ *
+ * @param {Array<number>} ids
+ * @param {String} message
+ */
+async function sendMessage(ids, message) {
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/actions/message/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        users: [],
+        usergroups: [],
+        devices: ids,
+        devicegroups: [],
+        message: message,
+      }),
+    }
+  );
+}
+
+async function changeOwner(user, ids) {
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/actions/change_owner/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        user: user,
+        devices: ids,
+      }),
+    }
+  );
+}
+
+async function changeName(id, name) {
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/actions/save_friendly_name/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        set_collective_name: false,
+        friendly_name_list: [name],
+        device_id_list: [id],
+        use_suffix: true,
+        suffix: 123,
+      }),
+    }
+  );
+}
+
+async function removeDevices(ids) {
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/actions/mark_as_disenrolled/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        devices: ids,
+      }),
+    }
+  );
+}
+
+async function installApps(ids, apps) {
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/actions/install_applications/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        apps: apps,
+        devices: ids,
+      }),
+    }
+  );
+}
 
 async function updateApplist() {
   let page = 1;
@@ -133,6 +247,39 @@ app.post("/update_app_list", async (req, res) => {
 app.post("/add_app/:id", async (req, res) => {
   await addApp(req.params.id);
   updateApplist();
+  return res.json("ok");
+});
+
+app.get("/devices", async (req, res) => {
+  return res.json(await getDevices());
+});
+
+app.get("/device-details/:id", async (req, res) => {
+  return res.json(await getDeviceDetails(req.params.id));
+});
+
+app.post("/send-message", async (req, res) => {
+  await sendMessage(req.body.ids, req.body.message);
+  return res.json("ok");
+});
+
+app.post("/change-owner", async (req, res) => {
+  await changeOwner(req.body.user, req.body.ids);
+  return res.json("ok");
+});
+
+app.post("/change-name", async (req, res) => {
+  await changeName(req.body.id, req.body.name);
+  return res.json("ok");
+});
+
+app.post("/remove-devices", async (req, res) => {
+  await removeDevices(req.body.ids);
+  return res.json("ok");
+});
+
+app.post("/install-apps", async (req, res) => {
+  await installApps(req.body.ids, req.body.apps);
   return res.json("ok");
 });
 
