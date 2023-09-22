@@ -175,6 +175,28 @@ async function addApp(id) {
   console.log(res);
 }
 
+async function removeApp(id) {
+  console.log(id);
+  const res = await fetch(
+    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/",
+    {
+      headers: {
+        Authorization: process.env.API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        add_apps: [],
+        remove_apps: [id],
+        add_groups: [],
+        remove_groups: [],
+      }),
+    }
+  );
+
+  console.log(res);
+}
+
 async function getReport() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
     headers: { Authorization: process.env.API_KEY },
@@ -247,39 +269,6 @@ app.post("/update_app_list", async (req, res) => {
 app.post("/add_app/:id", async (req, res) => {
   await addApp(req.params.id);
   updateApplist();
-  return res.json("ok");
-});
-
-app.get("/devices", async (req, res) => {
-  return res.json(await getDevices());
-});
-
-app.get("/device-details/:id", async (req, res) => {
-  return res.json(await getDeviceDetails(req.params.id));
-});
-
-app.post("/send-message", async (req, res) => {
-  await sendMessage(req.body.ids, req.body.message);
-  return res.json("ok");
-});
-
-app.post("/change-owner", async (req, res) => {
-  await changeOwner(req.body.user, req.body.ids);
-  return res.json("ok");
-});
-
-app.post("/change-name", async (req, res) => {
-  await changeName(req.body.id, req.body.name);
-  return res.json("ok");
-});
-
-app.post("/remove-devices", async (req, res) => {
-  await removeDevices(req.body.ids);
-  return res.json("ok");
-});
-
-app.post("/install-apps", async (req, res) => {
-  await installApps(req.body.ids, req.body.apps);
   return res.json("ok");
 });
 
