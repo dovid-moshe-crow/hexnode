@@ -7,9 +7,8 @@ app.use(express.json());
 
 import fetch from "node-fetch";
 
-let appList = [];
-let iosApps = [];
-let andApps = [];
+const appList = {};
+
 
 async function getDevices() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
@@ -123,13 +122,13 @@ async function installApps(ids, apps) {
   );
 }
 
-async function updateApplist() {
+async function updateApplist(catalogId) {
   let page = 1;
-  appList = [];
+  appList[catalogId] = [];
 
   const catalog = (
     await (
-      await fetch("https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/", {
+      await fetch(`https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/${catalogId}/`, {
         headers: { Authorization: process.env.API_KEY },
       })
     ).json()
@@ -144,8 +143,8 @@ async function updateApplist() {
         }
       )
     ).json();
-    appList = appList.concat(
-      res.results.map((x) => ({
+    appList[catalogId] = appList[catalogId].concat(
+      res.results.filter(x => x.platform === "ios").map((x) => ({
         ...x,
         installed: catalog.filter((e) => e.id === x.id).length > 0,
       }))
@@ -154,15 +153,11 @@ async function updateApplist() {
     page++;
   }
 
-  andApps = appList.filter(x => x.platform === "android");
-  iosApps = appList.filter(x => x.platform === "ios");
-
 }
 
-async function addApp(id) {
-  console.log(id);
+async function addApp(catalogId,id) {
   const res = await fetch(
-    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/",
+    `https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/${catalogId}/`,
     {
       headers: {
         Authorization: process.env.API_KEY,
@@ -177,14 +172,12 @@ async function addApp(id) {
       }),
     }
   );
-
-  console.log(res);
 }
 
-async function removeApp(id) {
+async function removeApp(catalogId,id) {
   console.log(id);
   const res = await fetch(
-    "https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/7/",
+    `https://or-efraim1.hexnodemdm.com/api/v1/appcatalogues/${catalogId}/`,
     {
       headers: {
         Authorization: process.env.API_KEY,
@@ -263,26 +256,18 @@ app.get("/unmanaged", async (req, res) => {
   return res.json(await getUnmanaged());
 });
 
-app.get("/app_list", async (req, res) => {
-  return res.json(appList);
+app.get("/app_list/:catalogId", async (req, res) => {
+  return res.json(appList[req.params.catalogId]);
 });
 
-app.get("/ios_apps", async (req, res) => {
-  return res.json(iosApps);
-});
-
-app.get("/and_apps", async (req, res) => {
-  return res.json(andApps);
-});
-
-app.post("/update_app_list", async (req, res) => {
-  await updateApplist();
+app.post("/update_app_list/:catalogId", async (req, res) => {
+  await updateApplist(req.params.catalogId);
   return res.json("ok");
 });
 
-app.post("/add_app/:id", async (req, res) => {
-  await addApp(req.params.id);
-  updateApplist();
+app.post("/add_app/:catalogId/:id", async (req, res) => {
+  await addApp(req.params.catalogId,req.params.id);
+  updateApplist(req.params.catalogId);
   return res.json("ok");
 });
 
@@ -320,13 +305,11 @@ app.post("/install-apps", async (req, res) => {
 });
 
 
-app.post("/remove_app/:id", async (req, res) => {
-  await removeApp(req.params.id);
-  updateApplist();
+app.post("/remove_app/:catalogId/:id", async (req, res) => {
+  await removeApp(req.params.catalogId,req.params.id);
+  updateApplist(req.params.catalogId);
   return res.json("ok");
 });
-
-updateApplist();
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
