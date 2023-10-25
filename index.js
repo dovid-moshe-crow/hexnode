@@ -8,6 +8,8 @@ app.use(express.json());
 import fetch from "node-fetch";
 
 let appList = [];
+let iosApps = [];
+let andApps = [];
 
 async function getDevices() {
   const res = await fetch("https://or-efraim1.hexnodemdm.com/api/v1/devices/", {
@@ -151,6 +153,10 @@ async function updateApplist() {
     if (!res.next) break;
     page++;
   }
+
+  andApps = appList.filter(x => x.platform === "android");
+  iosApps = appList.filter(x => x.platform === "ios");
+
 }
 
 async function addApp(id) {
@@ -261,6 +267,14 @@ app.get("/app_list", async (req, res) => {
   return res.json(appList);
 });
 
+app.get("/ios_apps", async (req, res) => {
+  return res.json(iosApps);
+});
+
+app.get("/and_apps", async (req, res) => {
+  return res.json(andApps);
+});
+
 app.post("/update_app_list", async (req, res) => {
   await updateApplist();
   return res.json("ok");
@@ -311,6 +325,8 @@ app.post("/remove_app/:id", async (req, res) => {
   updateApplist();
   return res.json("ok");
 });
+
+updateApplist();
 
 const port = process.env.PORT;
 app.listen(port, () => console.log(`listening on port ${port}...`));
