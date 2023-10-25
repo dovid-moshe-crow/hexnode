@@ -257,7 +257,8 @@ app.get("/unmanaged", async (req, res) => {
 });
 
 app.get("/app_list/:catalogId", async (req, res) => {
-  return res.json(appList[req.params.catalogId]);
+  
+  return res.json(appList[req.params.catalogId] ?? []);
 });
 
 app.post("/update_app_list/:catalogId", async (req, res) => {
