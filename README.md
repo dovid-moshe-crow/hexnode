@@ -18,3 +18,4 @@
 - `POST` /remove-devices -> ids
 - `POST` /install-apps -> (ids,apps)
 - `POST` /remove_app/:catalogId/:id
+- `POST` /add_app_to_group/:groupId/:appId

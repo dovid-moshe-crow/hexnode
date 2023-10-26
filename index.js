@@ -209,6 +209,16 @@ async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function addAppToGroup(appGroupId,appId) {
+  const res = fetch(`https://or-efraim1.hexnodemdm.com/api/v1/appgroups/${appGroupId}/`, {
+    headers: { Authorization: process.env.API_KEY, "Content-Type": "application/json" },
+    body:JSON.stringify({
+      add_apps:[appId],
+      remove_apps:[]
+    })
+  })
+}
+
 async function getUnmanaged() {
   const devices = (
     await (
@@ -247,6 +257,11 @@ async function getUnmanaged() {
 
   return unmanagedDevices;
 }
+
+app.post("/add_app_to_group/:groupId/:appId",async (req,res) => {
+  await addAppToGroup(req.params.groupId,req.params.appId);
+  return res.json("ok")
+})
 
 app.get("/last_reported", async (req, res) => {
   return res.json(await getReport());
