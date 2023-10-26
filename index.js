@@ -210,8 +210,9 @@ async function delay(ms) {
 }
 
 async function addAppToGroup(appGroupId,appId) {
-  const res = fetch(`https://or-efraim1.hexnodemdm.com/api/v1/appgroups/${appGroupId}/`, {
+  const res = await fetch(`https://or-efraim1.hexnodemdm.com/api/v1/appgroups/${appGroupId}/`, {
     headers: { Authorization: process.env.API_KEY, "Content-Type": "application/json" },
+    method:"POST",
     body:JSON.stringify({
       add_apps:[appId],
       remove_apps:[]
