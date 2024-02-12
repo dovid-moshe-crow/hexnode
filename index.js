@@ -143,6 +143,7 @@ async function updateApplist(catalogId) {
         }
       )
     ).json();
+    console.log(res)
 
     if(!res || !res.results) break;
 
