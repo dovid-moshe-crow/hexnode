@@ -143,9 +143,12 @@ async function updateApplist(catalogId) {
         }
       )
     ).json();
-    console.log(res)
+   
 
-    if(!res || !res.results) break;
+    if(!res || !res.results) {
+      console.log(res)
+      break;
+    }
 
     appList[catalogId] = appList[catalogId].concat(
       res.results.filter(x => x.platform === "ios").map((x) => ({
